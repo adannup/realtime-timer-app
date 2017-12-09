@@ -36,11 +36,11 @@ export default class TimerForm extends Component {
         <div className="card-body">
           <div className="form-group">
             <label htmlFor="title">Title</label>
-            <input type="text" className="form-control" name='title' value={this.state.title} onChange={this.onInputChange}/>
+            <input type="text" className="form-control" name='title' value={this.state.fields.title} onChange={this.onInputChange}/>
           </div>
           <div className="form-group">
             <label htmlFor="project">Project</label>
-            <input type="text" className="form-control" name='project' value={this.state.project} onChange={this.onInputChange}/>
+            <input type="text" className="form-control" name='project' value={this.state.fields.project} onChange={this.onInputChange}/>
           </div>
         </div>
         <div className="card-footer bg-white">

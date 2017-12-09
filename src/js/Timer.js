@@ -1,8 +1,33 @@
 import React, { Component } from 'react';
+import { renderElapsedString } from './helpers';
+import TimerActionButton from './TimerActionButton';
 
 export default class Timer extends Component  {
+  constructor() {
+    super();
+
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
+    this.handleRunningClick = this.handleRunningClick.bind(this);
+  }
+
+  componentDidMount() {
+    this.forceUpdateInterval = setInterval(() => this.forceUpdate() , 50);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.forceUpdateInterval);
+  }
+
+  handleDeleteClick() {
+    this.props.onDeleteClick(this.props.id);
+  }
+
+  handleRunningClick() {
+    this.props.onRunningClick(this.props.id);
+  }
+
   render () {
-    const elapsedString = this.props.elapsed;
+    const elapsedString = renderElapsedString(this.props.elapsed, this.props.runningSince);
     return (
       <div className="card mt-4">
         <div className="card-body">
@@ -11,13 +36,16 @@ export default class Timer extends Component  {
           <h3 className="text-center">{elapsedString}</h3>
           <div className='row'>
             <div className='col-12'>
-              <button type="button" className="btn btn-light float-right ml-2"><i className="material-icons">mode_edit</i></button>
-              <button type="button" className="btn btn-light float-right "><i className="material-icons">delete</i></button>
+              <button type="button" className="btn btn-light float-right ml-2"><i className="material-icons" onClick={this.props.onEditClick} >mode_edit</i></button>
+              <button type="button" className="btn btn-light float-right "><i className="material-icons" onClick={this.handleDeleteClick}>delete</i></button>
             </div>
           </div>
         </div>
         <div className="card-footer bg-white">
-          <button type="button" className="btn btn-outline-success w-100 border-0 rounded-0">Start</button>
+          <TimerActionButton
+            timerIsRunning={!!this.props.runningSince}
+            onRunningClick={this.handleRunningClick}
+          />
         </div>
       </div>
     )

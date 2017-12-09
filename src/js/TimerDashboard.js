@@ -27,6 +27,9 @@ export default class TimerDashboard extends Component {
     }
 
     this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
+    this.handleUpdateFormSubmit = this.handleUpdateFormSubmit.bind(this);
+    this.handleDeleteTimer = this.handleDeleteTimer.bind(this);
+    this.handleRunningTimer = this.handleRunningTimer.bind(this);
   }
 
   handleCreateFormSubmit(timer) {
@@ -50,10 +53,78 @@ export default class TimerDashboard extends Component {
     callback(t);
   }
 
+  handleUpdateFormSubmit(timer) {
+    this.updateTimer(timer, (timers) => {
+      this.setState({ timers });
+    });
+  }
+
+  updateTimer(timerUpdate, callback) {
+    const timers = this.state.timers.map( timer => {
+      if(timer.id === timerUpdate.id) {
+        return Object.assign({}, timer, {
+          title: timerUpdate.title,
+          project: timerUpdate.project
+        })
+      }else {
+        return timer;
+      }
+    });
+
+    callback(timers);
+  }
+
+  handleDeleteTimer(timerId) {
+    this.deleteTimer(timerId);
+  }
+
+  deleteTimer(timerId) {
+    this.setState({
+      timers: this.state.timers.filter(timer => timer.id !== timerId)
+    })
+  }
+
+  handleRunningTimer(timerId) {
+    this.setState({
+      timers: this.state.timers.map(timer => {
+        if(timer.id === timerId) {
+          if(!!timer.runningSince) {
+            return this.stopTimer(timer);
+          } else {
+            return this.startTimer(timer);
+          }
+        } else {
+          return timer;
+        }
+      })
+    })
+  }
+
+  startTimer(timer) {
+    const now = Date.now();
+    return Object.assign({}, timer, {
+      runningSince: now,
+    });
+  }
+
+  stopTimer(timer) {
+    const now = Date.now();
+    const lastElapsed = now - timer.runningSince;
+    return Object.assign({}, timer, {
+      elapsed: timer.elapsed + lastElapsed,
+      runningSince: null
+    });
+  }
+
   render () {
     return (
       <div className='col-6'>
-        <EditableTimerList timers={this.state.timers}/>
+        <EditableTimerList
+          timers={this.state.timers}
+          onEditForm={this.handleUpdateFormSubmit}
+          onDeleteClick={this.handleDeleteTimer}
+          onRunningClick={this.handleRunningTimer}
+        />
         <ToggleableTimerForm isOpen={false} onFormSubmit={this.handleCreateFormSubmit}/>
       </div>
     )
