@@ -7,7 +7,8 @@ export default class Timer extends Component  {
     super();
 
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
-    this.handleRunningClick = this.handleRunningClick.bind(this);
+    this.handleStopClick = this.handleStopClick.bind(this);
+    this.handleStartClick = this.handleStartClick.bind(this);
   }
 
   componentDidMount() {
@@ -22,8 +23,12 @@ export default class Timer extends Component  {
     this.props.onDeleteClick(this.props.id);
   }
 
-  handleRunningClick() {
-    this.props.onRunningClick(this.props.id);
+  handleStopClick() {
+    this.props.onStopClick(this.props.id);
+  }
+
+  handleStartClick() {
+    this.props.onStartClick(this.props.id);
   }
 
   render () {
@@ -44,7 +49,8 @@ export default class Timer extends Component  {
         <div className="card-footer bg-white">
           <TimerActionButton
             timerIsRunning={!!this.props.runningSince}
-            onRunningClick={this.handleRunningClick}
+            onStopClick={this.handleStopClick}
+            onStartClick={this.handleStartClick}
           />
         </div>
       </div>

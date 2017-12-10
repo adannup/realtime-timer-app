@@ -45,9 +45,39 @@ const editTimer = timerEdited => {
   saveTimers(timers);
 }
 
+const startTimer = (timerId) => {
+  const now = Date.now();
+  const timers = fetchTimers();
+
+  timers.forEach(timer => {
+    if(timer.id === timerId) {
+      timer.runningSince = now
+    }
+  });
+
+  saveTimers(timers);
+}
+
+const stopTimer = (timerId) => {
+  const now = Date.now();
+  const timers = fetchTimers();
+
+  timers.forEach(timer => {
+    if(timer.id === timerId) {
+      const lastElapsed = now - timer.runningSince;
+      timer.elapsed = timer.elapsed + lastElapsed;
+      timer.runningSince = null;
+    }
+  });
+
+  saveTimers(timers);
+}
+
 module.exports = {
   fetchTimers,
   addTimer,
   deleteTimer,
-  editTimer
+  editTimer,
+  startTimer,
+  stopTimer
 }

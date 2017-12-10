@@ -13,7 +13,8 @@ export default class EditableTimerList extends Component {
         runningSince={timer.runningSince}
         onEditForm={this.props.onEditForm}
         onDeleteClick={this.props.onDeleteClick}
-        onRunningClick={this.props.onRunningClick}
+        onStopClick={this.props.onStopClick}
+        onStartClick={this.props.onStartClick}
       />
     ));
     return (

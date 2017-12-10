@@ -6,7 +6,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-const {fetchTimers, addTimer, deleteTimer, editTimer} = require('./fetchTimers');
+const {fetchTimers, addTimer, deleteTimer, editTimer, startTimer, stopTimer} = require('./utilsTimers');
 const config = require('./webpack.config');
 
 const PORT = process.env.PORT || config.devServer.port;
@@ -42,7 +42,17 @@ io.on('connection', (socket) => {
   socket.on('editTimer', (timerEdited) => {
     editTimer(timerEdited);
     io.emit('updateData', fetchTimers());
-  })
+  });
+
+  socket.on('startTimer', (timerId) => {
+    startTimer(timerId);
+    io.emit('updateData', fetchTimers());
+  });
+
+  socket.on('stopTimer', (timerId) => {
+    stopTimer(timerId);
+    io.emit('updateData', fetchTimers());
+  });
 });
 
 http.listen(PORT, () => {
