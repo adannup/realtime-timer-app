@@ -118,7 +118,7 @@ export default class TimerDashboard extends Component {
 
   render () {
     return (
-      <div className='col-6'>
+      <div className='col-md-6 col-sm-12'>
         <EditableTimerList
           timers={this.state.timers}
           onEditForm={this.handleUpdateFormSubmit}
