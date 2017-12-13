@@ -6,7 +6,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-const {fetchTimers, addTimer, deleteTimer, editTimer, startTimer, stopTimer} = require('./utilsTimers');
+const {fetchTimers, saveTimers} = require('./utilsTimers');
 const config = require('./webpack.config');
 
 const PORT = process.env.PORT || config.devServer.port;
@@ -29,30 +29,11 @@ io.on('connection', (socket) => {
 
   socket.emit('setTimers', fetchTimers());
 
-  socket.on('addTimer', (timer) => {
-    addTimer(timer);
-    io.emit('updateData', fetchTimers());
-  });
-
-  socket.on('deleteTimer', (timerId) => {
-    deleteTimer(timerId);
-    io.emit('updateData', fetchTimers());
-  });
-
-  socket.on('editTimer', (timerEdited) => {
-    editTimer(timerEdited);
-    io.emit('updateData', fetchTimers());
-  });
-
-  socket.on('startTimer', (timerId) => {
-    startTimer(timerId);
-    io.emit('updateData', fetchTimers());
-  });
-
-  socket.on('stopTimer', (timerId) => {
-    stopTimer(timerId);
-    io.emit('updateData', fetchTimers());
-  });
+  socket.on('saveState', (timers) => {
+    saveTimers(timers, (timersUpdated) => {
+      socket.broadcast.emit('updateData', timersUpdated);
+    });
+  })
 });
 
 http.listen(PORT, () => {
