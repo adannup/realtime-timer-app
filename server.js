@@ -8,6 +8,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const {fetchTimers, addTimer, deleteTimer, editTimer, startTimer, stopTimer} = require('./utilsTimers');
 const config = require('./webpack.config');
+const api = require('./api');
 
 const PORT = process.env.PORT || config.devServer.port;
 const compiler = webpack(config);
@@ -54,6 +55,8 @@ io.on('connection', (socket) => {
     io.emit('updateData', fetchTimers());
   });
 });
+
+app.use('/api', api);
 
 http.listen(PORT, () => {
   console.log(`Server up on port ${PORT}`);
