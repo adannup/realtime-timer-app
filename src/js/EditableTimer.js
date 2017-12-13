@@ -49,6 +49,7 @@ export default class EditableTimer extends Component {
           project={this.props.project}
           elapsed={this.props.elapsed}
           runningSince={this.props.runningSince}
+          fetched={this.props.fetched}
           onEditClick={this.handleEditClick}
           onDeleteClick={this.props.onDeleteClick}
           onStopClick={this.props.onStopClick}

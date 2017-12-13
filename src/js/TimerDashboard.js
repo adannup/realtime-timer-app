@@ -58,6 +58,7 @@ export default class TimerDashboard extends Component {
     const t = {
       title: timer.title || 'Timer',
       project: timer.project || 'Project',
+      fetched: true,
       id: uuidv4(),
       elapsed: 0,
     };
@@ -70,21 +71,6 @@ export default class TimerDashboard extends Component {
     //   this.setState({ timers });
     // });
     socket.emit('editTimer', timer);
-  }
-
-  updateTimer(timerUpdate, callback) {
-    // const timers = this.state.timers.map( timer => {
-    //   if(timer.id === timerUpdate.id) {
-    //     return Object.assign({}, timer, {
-    //       title: timerUpdate.title,
-    //       project: timerUpdate.project
-    //     })
-    //   }else {
-    //     return timer;
-    //   }
-    // });
-    //
-    // callback(timers);
   }
 
   handleDeleteTimer(timerId) {
@@ -107,40 +93,31 @@ export default class TimerDashboard extends Component {
   }
 
   stopTimer(timerId) {
-    socket.emit('stopTimer', timerId);
-    // const now = Date.now();
-    //
-    // this.setState({
-    //   timers: this.state.timers.map(timer => {
-    //     if(timer.id === timerId) {
-    //       const lastElapsed = now - timer.runningSince;
-    //       return Object.assign({}, timer, {
-    //         elapsed: timer.elapsed + lastElapsed,
-    //         runningSince: null
-    //       });
-    //     } else {
-    //       return timer;
-    //     }
-    //   })
-    // });
+    this.setState({
+      timers: this.state.timers.map(timer => {
+        if(timer.id === timerId) {
+          return Object.assign({}, timer, {
+            fetched: false
+          })
+        }else {
+          return timer;
+        }
+      })
+    }, () => {socket.emit('stopTimer', timerId)});
   }
 
   startTimer(timerId) {
-    socket.emit('startTimer', timerId);
-
-    // const now = Date.now();
-    //
-    // this.setState({
-    //   timers: this.state.timers.map(timer => {
-    //     if(timer.id === timerId) {
-    //       return Object.assign({}, timer, {
-    //         runningSince: now,
-    //       });
-    //     } else {
-    //       return timer;
-    //     }
-    //   })
-    // });
+    this.setState({
+      timers: this.state.timers.map(timer => {
+        if(timer.id === timerId) {
+          return Object.assign({}, timer, {
+            fetched: false
+          })
+        }else {
+          return timer;
+        }
+      })
+    }, () => {socket.emit('startTimer', timerId)});
   }
 
   render () {

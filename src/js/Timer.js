@@ -49,6 +49,7 @@ export default class Timer extends Component  {
         <div className="card-footer bg-white">
           <TimerActionButton
             timerIsRunning={!!this.props.runningSince}
+            fetched={this.props.fetched}
             onStopClick={this.handleStopClick}
             onStartClick={this.handleStartClick}
           />

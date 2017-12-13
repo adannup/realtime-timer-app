@@ -10,6 +10,7 @@ export default class EditableTimerList extends Component {
         title={timer.title}
         project={timer.project}
         elapsed={timer.elapsed}
+        fetched={timer.fetched}
         runningSince={timer.runningSince}
         onEditForm={this.props.onEditForm}
         onDeleteClick={this.props.onDeleteClick}
