@@ -2,43 +2,55 @@ import React, { Component } from 'react';
 import EditableTimerList from './EditableTimerList';
 import ToggleableTimerForm from './ToggleableTimerForm';
 import uuidv4 from 'uuid/v4';
+import io from 'socket.io-client';
+const socket = io();
 
 export default class TimerDashboard extends Component {
   constructor() {
     super();
 
     this.state = {
-      timers: [
-        {
-          title: 'Practice squat',
-          project: 'Gym Chores',
-          id: 1,
-          elapsed: 5456099,
-          runningSince: Date.now(),
-        },
-        {
-          title: 'Bake squash',
-          project: 'Kitchen Chores',
-          id: 2,
-          elapsed: 1273998,
-          runningSince: null,
-        },
-      ],
+      timers: []
     }
 
     this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
     this.handleUpdateFormSubmit = this.handleUpdateFormSubmit.bind(this);
     this.handleDeleteTimer = this.handleDeleteTimer.bind(this);
-    this.handleRunningTimer = this.handleRunningTimer.bind(this);
+    this.handleStopTimer = this.handleStopTimer.bind(this);
+    this.handleStartTimer = this.handleStartTimer.bind(this);
+    this.startTimer = this.startTimer.bind(this);
+    this.stopTimer = this.stopTimer.bind(this);
+
+  }
+
+  componentWillMount() {
+    socket.on('connect', () => {
+      console.log('Connected to server');
+
+      socket.on('setTimers',(timers) => {
+        this.setState({ timers });
+      });
+    });
+
+    socket.on('disconnect', () => {
+      console.log('disconnected from server');
+    });
+  }
+
+  componentDidMount() {
+    socket.on('updateData', (timers) => {
+      this.setState({ timers });
+    });
   }
 
   handleCreateFormSubmit(timer) {
-    this.createTimer(timer, (t) => {
+    this.createTimer(timer, (newTimer) => {
       // this.setState({
       //   timers: this.state.timers.concat(t)
       // })
-      const timers = [...this.state.timers, t];
-      this.setState({ timers });
+      const timers = [...this.state.timers, newTimer];
+      // this.setState({ timers });
+      socket.emit('addTimer', newTimer);
     });
   }
 
@@ -54,24 +66,25 @@ export default class TimerDashboard extends Component {
   }
 
   handleUpdateFormSubmit(timer) {
-    this.updateTimer(timer, (timers) => {
-      this.setState({ timers });
-    });
+    // this.updateTimer(timer, (timers) => {
+    //   this.setState({ timers });
+    // });
+    socket.emit('editTimer', timer);
   }
 
   updateTimer(timerUpdate, callback) {
-    const timers = this.state.timers.map( timer => {
-      if(timer.id === timerUpdate.id) {
-        return Object.assign({}, timer, {
-          title: timerUpdate.title,
-          project: timerUpdate.project
-        })
-      }else {
-        return timer;
-      }
-    });
-
-    callback(timers);
+    // const timers = this.state.timers.map( timer => {
+    //   if(timer.id === timerUpdate.id) {
+    //     return Object.assign({}, timer, {
+    //       title: timerUpdate.title,
+    //       project: timerUpdate.project
+    //     })
+    //   }else {
+    //     return timer;
+    //   }
+    // });
+    //
+    // callback(timers);
   }
 
   handleDeleteTimer(timerId) {
@@ -79,41 +92,55 @@ export default class TimerDashboard extends Component {
   }
 
   deleteTimer(timerId) {
-    this.setState({
-      timers: this.state.timers.filter(timer => timer.id !== timerId)
-    })
+    // this.setState({
+    //   timers: this.state.timers.filter(timer => timer.id !== timerId)
+    // })
+    socket.emit('deleteTimer',timerId);
   }
 
-  handleRunningTimer(timerId) {
-    this.setState({
-      timers: this.state.timers.map(timer => {
-        if(timer.id === timerId) {
-          if(!!timer.runningSince) {
-            return this.stopTimer(timer);
-          } else {
-            return this.startTimer(timer);
-          }
-        } else {
-          return timer;
-        }
-      })
-    })
+  handleStopTimer(timerId) {
+    this.stopTimer(timerId);
   }
 
-  startTimer(timer) {
-    const now = Date.now();
-    return Object.assign({}, timer, {
-      runningSince: now,
-    });
+  handleStartTimer(timerId) {
+    this.startTimer(timerId);
   }
 
-  stopTimer(timer) {
-    const now = Date.now();
-    const lastElapsed = now - timer.runningSince;
-    return Object.assign({}, timer, {
-      elapsed: timer.elapsed + lastElapsed,
-      runningSince: null
-    });
+  stopTimer(timerId) {
+    socket.emit('stopTimer', timerId);
+    // const now = Date.now();
+    //
+    // this.setState({
+    //   timers: this.state.timers.map(timer => {
+    //     if(timer.id === timerId) {
+    //       const lastElapsed = now - timer.runningSince;
+    //       return Object.assign({}, timer, {
+    //         elapsed: timer.elapsed + lastElapsed,
+    //         runningSince: null
+    //       });
+    //     } else {
+    //       return timer;
+    //     }
+    //   })
+    // });
+  }
+
+  startTimer(timerId) {
+    socket.emit('startTimer', timerId);
+
+    // const now = Date.now();
+    //
+    // this.setState({
+    //   timers: this.state.timers.map(timer => {
+    //     if(timer.id === timerId) {
+    //       return Object.assign({}, timer, {
+    //         runningSince: now,
+    //       });
+    //     } else {
+    //       return timer;
+    //     }
+    //   })
+    // });
   }
 
   render () {
@@ -123,7 +150,8 @@ export default class TimerDashboard extends Component {
           timers={this.state.timers}
           onEditForm={this.handleUpdateFormSubmit}
           onDeleteClick={this.handleDeleteTimer}
-          onRunningClick={this.handleRunningTimer}
+          onStartClick={this.handleStartTimer}
+          onStopClick={this.handleStopTimer}
         />
         <ToggleableTimerForm isOpen={false} onFormSubmit={this.handleCreateFormSubmit}/>
       </div>
