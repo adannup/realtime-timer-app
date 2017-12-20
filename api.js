@@ -11,8 +11,6 @@ const DATA_PATH = path.join(__dirname, 'data/data.json');
 api.use(bodyParser.json());
 api.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-api
-
 api.post('/timers/start', (req, res) => {
   const timerId = req.body.id;
   const now = Date.now();
