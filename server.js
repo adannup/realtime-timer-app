@@ -31,9 +31,8 @@ io.on('connection', (socket) => {
   socket.emit('setTimers', fetchTimers());
 
   socket.on('saveState', (timers) => {
-    saveTimers(timers, (timersUpdated) => {
-      socket.broadcast.emit('updateData', timersUpdated);
-    });
+    saveTimers(timers);
+    socket.broadcast.emit('updateData', fetchTimers());
   })
 });
 
